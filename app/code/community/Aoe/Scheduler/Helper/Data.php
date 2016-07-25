@@ -19,6 +19,8 @@ class Aoe_Scheduler_Helper_Data extends Mage_Core_Helper_Abstract
 
     const VAR_LAST_RUN_USER_CODE       = 'aoescheduler_lastrunuser';
 
+    const CURRENT_USER                 = 'www-data';
+
     protected $groupsToJobsMap = null;
 
     /**
@@ -347,7 +349,7 @@ class Aoe_Scheduler_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getRunningUser()
     {
-        return trim(shell_exec('whoami'));
+        return self::CURRENT_USER;
     }
 
     /**

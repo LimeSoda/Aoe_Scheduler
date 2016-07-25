@@ -1,7 +1,16 @@
 #!/bin/bash
 
-# Generate an error if any variable doesn't exist
-set -o nounset
+EMAIL_RECIPIENT=""
+MAX_DURATION="43200"
+
+##########################################
+# Do not modify anything below this line #
+##########################################
+
+print_time() {
+  echo -e "\n=============================================================\n$1:$(date)\n=============================================================" >> $LOG_FILE 2>&1
+  echo "$1"
+}
 
 delete_lock() {
     LOCKDIR=$1
@@ -107,8 +116,14 @@ fi
 MODE="default"
 INCLUDE_GROUPS=""
 EXCLUDE_GROUPS=""
-INCLUDE_JOBS=""
-EXCLUDE_JOBS=""
+INCLUDE_JOBS="$SCHEDULER_WHITELIST"
+EXCLUDE_JOBS="$SCHEDULER_BLACKLIST"
+
+INSTALLDIR=$(dirname $0)
+PHP_BIN=$(which php)
+DOMAIN_GROUP=$(echo $INSTALLDIR | sed -n -E 's#/.*domains/([^/]+)/domains.*#\1#p')
+REL_INSTALLDIR=$(echo $INSTALLDIR | sed -E "s#.*?$DOMAIN_GROUP/#/#g" )
+LOG_FILE="$INSTALLDIR/var/log/cron.log"
 
 # Parse command line args (very simplistic)
 while [ $# -gt 0 ]; do
@@ -175,5 +190,15 @@ if [ -n "${EXCLUDE_JOBS}" ]; then
     OPTIONS="${OPTIONS} --excludeJobs ${EXCLUDE_JOBS}"
 fi
 
+print_time "Starting cron"
+
 # Run the job in the foreground
-"${PHP_BIN}" "${SCHEDULER}" --action cron --mode ${MODE} ${OPTIONS}
+echo "${PHP_BIN} ${REL_INSTALLDIR}/shell/${SCHEDULER} --action cron --mode ${MODE} ${OPTIONS}" | timeout $MAX_DURATION fakechroot /usr/sbin/chroot /microcloud/domains/$DOMAIN_GROUP /bin/bash #>> $LOG_FILE 2>&1
+RES=$?
+
+if [ $RES -ne 0 ] && [[ ! "$EMAIL_RECIPIENT" == "" ]]; then
+  echo "Something went wrong with the cron, see attached" | mutt -s "Cron error" -a "$LOG_FILE" -- $EMAIL_RECIPIENT
+fi
+
+print_time "Completed cron"
+exit 0
