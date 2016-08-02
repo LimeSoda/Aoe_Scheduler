@@ -193,7 +193,7 @@ fi
 print_time "Starting cron"
 
 # Run the job in the foreground
-echo "${PHP_BIN} ${REL_INSTALLDIR}/shell/${SCHEDULER} --action cron --mode ${MODE} ${OPTIONS}" | timeout $MAX_DURATION fakechroot /usr/sbin/chroot /microcloud/domains/$DOMAIN_GROUP /bin/bash #>> $LOG_FILE 2>&1
+echo "cd ${REL_INSTALLDIR}/shell; ${PHP_BIN} ${SCHEDULER} --action cron --mode ${MODE} ${OPTIONS}" | timeout $MAX_DURATION fakechroot /usr/sbin/chroot /microcloud/domains/$DOMAIN_GROUP /bin/bash #>> $LOG_FILE 2>&1
 RES=$?
 
 if [ $RES -ne 0 ] && [[ ! "$EMAIL_RECIPIENT" == "" ]]; then
