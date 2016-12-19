@@ -1,7 +1,7 @@
 #!/bin/bash
 
 EMAIL_RECIPIENT=""
-MAX_DURATION="43200"
+MAX_DURATION="7200"
 
 ##########################################
 # Do not modify anything below this line #
