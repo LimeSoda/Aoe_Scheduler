@@ -1,5 +1,5 @@
 {
-  "name": "aoepeople/aoe_scheduler",
+  "name": "limesoda/aoe_scheduler",
   "license": "GPL-3.0",
   "type": "magento-module",
   "description": "Magento Cron Scheduler",
@@ -21,7 +21,7 @@
     }
   ],
   "replace": {
-    "fbrnc/aoe_scheduler": "*"
+    "aoepeople/aoe_scheduler": "*"
   }
 }
 
